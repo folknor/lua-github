@@ -1102,7 +1102,7 @@ end -- wraps the REST API section
 do
 	local fnDoc = [[
   gh = require("lua-github")
-  headers, data1, ... = gh.%s(%s)
+  headers, data1, ... = gh.%s["%s"](%s)
 
   HTTP
   %s /%s
@@ -1123,14 +1123,6 @@ do
   It's important to note that any function in the library may in fact simply return 304 on consecutive
   requests, along with the cached json table returned the last time the same URL was requested.
 ]]
-	local built = {
-		GET = {},
-		PATCH = {},
-		PUT = {},
-		POST = {},
-		DELETE = {},
-	}
-
 	local commonArgs = {
 		owner = "string, organization or user name.",
 		org = "string, organization name.",
@@ -1139,10 +1131,11 @@ do
 		username = "string, user name.",
 		releaseId = "number, release identifier."
 	}
-	function M:Describe(method, funcName)
-		if built[method][funcName] then return built[method][funcName] end
-		local fn = self[method][funcName]
-		if not fn then return ("No function of name %q."):format(funcName) end
+	-- XXX should move this to be lazyloaded through the fn.helpText/signature properties
+	function M.describe(fn)
+		if not fn then return ("No function of name %q."):format(fn.rawPath) end
+		if fn.helpText then return fn.helpText end
+
 		local opts = {}
 		local optDescs = {}
 		if fn.body then
@@ -1190,14 +1183,15 @@ do
 			end
 		end
 
-		--shorthands[funcName] = table.concat(opts, ", ")
-		built[method][funcName] = fnDoc:format(
-			funcName,
+		fn.signature = table.concat(opts, ", ")
+		fn.helpText = fnDoc:format(
+			fn.method,
+			fn.rawPath,
 			table.concat(opts, ", "),
 			fn.method, fn.rawPath,
 			table.concat(optDescs, "\n")
 		)
-		return built[method][funcName]
+		return fn.helpText
 	end
 end
 
@@ -1231,16 +1225,17 @@ do
 		return name
 	end
 
-	local easy = {
-		uploadReleaseAsset = M.uploadReleaseAsset
-	}
+	local easy = { uploadReleaseAsset = M.uploadReleaseAsset }
+	M.describe(M.uploadReleaseAsset)
+
 	local function addAlias(method, path, alias)
 		if not M[method] then return end
 		if not M[method][path] then return end
 		local fn = M[method][path]
 		if not alias then alias = constructName(fn.method:lower(), fn.rawPath) end
+		M.describe(fn)
 		if easy[alias] then return end
-		easy[alias] = M[method][path]
+		easy[alias] = fn
 		return alias
 	end
 	M.AddAlias = addAlias

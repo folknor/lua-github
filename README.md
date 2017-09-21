@@ -1,6 +1,18 @@
 # lua-github
 lua-curl wrapper for the GitHub ReST API v3.
 
+## How to install
+
+```
+$ git clone https://github.com/folknor/lua-github.git
+$ cd lua-github
+$ luarocks --local make rockspecs/lua-github-scm-0.rockspec
+```
+
+The module is not published on luarocks.org yet.
+
+## Description
+
 The code isn't very nice, because I just wanted to get it working ASAP. I don't really care about performance, because I only use it from shell scripts.
 
 I welcome patches, and I welcome invasive and destructive patches - there is no API stability, there is no coding convention, there is no "please don't make whitespace changes", there are no limits. If you want to contribute, then please do - unhinged.

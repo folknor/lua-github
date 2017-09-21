@@ -1,6 +1,15 @@
 # lua-github
 lua-curl wrapper for the GitHub ReST API v3.
 
+## .netrc / _netrc
+
+Right now the module only reads .netrc for authentication. Instructions on how to set it up can be found at:
+* https://github.com/whiteinge/ok.sh#setup
+* https://ec.haxx.se/usingcurl-netrc.html
+* https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html
+
+I welcome patches for oauth/whatever. Since I only use it in shell scripts myself, don't count on me adding any other auth support.
+
 ## How to install
 
 ```
@@ -41,7 +50,9 @@ uploadReleaseAsset: owner, repo, releaseId, qualifiedFile, ?contentType(=guess),
 ```
 (uploadReleaseAssets qualifiedFile is simply passed directly to io.open)
 
-But most of the API is actually contained in `require("lua-github").GET, .POST, .DELETE, .PUT` (there are no `.PATCH` APIS implemented yet). For example `require("lua-github").GET["repos/:owner/:repo/releases/latest"](owner, repo)`.
+Most of the API is actually contained in `require("lua-github").GET, .POST, .DELETE, .PUT` (there are no `.PATCH` APIS implemented yet). For example `require("lua-github").GET["repos/:owner/:repo/releases/latest"](owner, repo)`.
+
+For `createRelease`, `body` is a lua table that will get converted to JSON by dkjson before post. `gh.describe(gh.createRelease)` should tell you more, but so do the GitHub docs at https://developer.github.com/v3/repos/releases/#create-a-release.
 
 ## Example
 
@@ -90,7 +101,7 @@ The library has a .describe function that produces an automated help text. I'm n
   requests, along with the cached json table returned the last time the same URL was requested.
 ```
 
-Only the shorthand aliases in `.easy` are described on `require`. If you want the signature or help text of a "core" method, you need to send that reference to `require("lua-github").describe(ref)` first. `.signature` and `.helpText` should be wrapped in a metatable access check and autodescribed, but I don't care about any of this right now.
+Only the aliases in `.easy` are populated with `.helpText` and `.signature` after invoking `require("lua-github")`. If you want the signature or help text of a "core" method, you need to send that reference to `require("lua-github").describe(ref)` first. `.signature` and `.helpText` should be wrapped in a metatable access check and autodescribed, but I don't care about any of this right now.
 
 ## Adding a runtime alias
 

@@ -24,9 +24,8 @@ dependencies = {
 }
 
 build = {
-	copy_directories = {"examples"},
 	type = "builtin",
 	modules = {
-		["lcurl-github"] = "src/github.lua",
+		["lua-github"] = "src/github.lua",
 	}
 }

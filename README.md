@@ -15,7 +15,7 @@ I welcome patches for oauth/whatever. Since I only use it in shell scripts mysel
 ```
 $ git clone https://github.com/folknor/lua-github.git
 $ cd lua-github
-$ luarocks --local make rockspecs/lua-github-scm-0.rockspec
+$ luarocks --local install rockspecs/lua-github-scm-0.rockspec
 ```
 
 The module is not published on luarocks.org yet.

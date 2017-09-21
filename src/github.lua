@@ -323,7 +323,6 @@ local get, put, delete, post
 do
 	local function invokeFunc(self, ...)
 		local walker = 1
-		local tokens = {}
 		if self.body then
 			self.body = (select(walker, ...))
 			walker = walker + 1
@@ -337,9 +336,10 @@ do
 			walker = walker + 1
 			if not self.contentType then return nil, "contentType is a required parameter." end
 		end
+		local tokens = {}
 		for _, arg in next, self.requiredArgs do
 			local tok = select(walker, ...)
-			tokens[walker] = tok
+			tokens[#tokens+1] = tok
 			walker = walker + 1
 			if type(tok) ~= "string" then return nil, ("%q is a required parameter."):format(arg) end
 		end

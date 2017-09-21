@@ -82,7 +82,6 @@ end
 local _neturl = require("net.url")
 local _dkjson = require("dkjson")
 local _curl = require("lcurl")
-local _lfs = require("lfs")
 
 local _H_ACCEPT = "Accept: application/vnd.github.v3+json"
 local _H_CONTENT_TYPE = "Content-Type: %s"
@@ -188,8 +187,11 @@ local function _doPostFile(_, path, file, contentType)
 	if type(file) ~= "string" then return nil, "Invalid file path" end
 	if type(contentType) ~= "string" then contentType = guessMime(file) end
 
-	local size, err = _lfs.attributes(file, "size")
-	if type(size) ~= "number" then return nil, err end
+	local stream = io.open(file, "rb")
+	if not stream then return nil, ("Failed to open file %q."):format(file) end
+	local size = stream:seek("end")
+	stream:seek("set", 0)
+	if type(size) ~= "number" then return nil, "Failed to get file size." end
 
 	local headers = {
 		_H_ACCEPT,
@@ -197,8 +199,6 @@ local function _doPostFile(_, path, file, contentType)
 		_H_USER_AGENT,
 		_H_CONTENT_LENGTH:format(size)
 	}
-	local stream = io.open(file, "rb")
-	if not stream then return nil, ("Failed to open file %q."):format(file) end
 
 	local rawHeaders = ""
 	local rawData = ""
@@ -1240,12 +1240,13 @@ do
 	end
 	M.AddAlias = addAlias
 
-	addAlias("GET",    "orgs/:org/repos",                 "getOrgRepositories")
-	addAlias("GET",    "user/repos",                      "getYourRepositories")
-	addAlias("GET",    "users/:username/repos",           "getUserRepositories")
-	addAlias("GET",    "repos/:owner/:repo/releases",     "listReleases")
-	addAlias("GET",    "repos/:owner/:repo/releases/:id", "getRelease")
-	addAlias("POST",   "repos/:owner/:repo/releases",     "createRelease")
+	addAlias("GET",    "orgs/:org/repos",                    "getOrgRepositories")
+	addAlias("GET",    "user/repos",                         "getYourRepositories")
+	addAlias("GET",    "users/:username/repos",              "getUserRepositories")
+	addAlias("GET",    "repos/:owner/:repo/releases",        "listReleases")
+	addAlias("GET",    "repos/:owner/:repo/releases/:id",    "getRelease")
+	addAlias("POST",   "repos/:owner/:repo/releases",        "createRelease")
+	addAlias("GET",    "repos/:owner/:repo/releases/latest", "latestRelease")
 
 	M.easy = easy
 end

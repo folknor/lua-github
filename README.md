@@ -38,6 +38,7 @@ getOrgRepositories: org, ?type(=all)
 getYourRepositories: ?type(=all), ?sort(=full_name), ?direction(=desc), ?visibility(=all), ?affiliation(=owner,collaborator,organization_member)
 uploadReleaseAsset: owner, repo, releaseId, qualifiedFile, ?contentType(=guess), ?label(=nil), ?uploadUrl(=nil)
 ```
+(uploadReleaseAssets qualifiedFile is simply passed directly to io.open)
 
 But most of the API is actually contained in `require("lua-github").GET, .POST, .DELETE, .PUT` (there are no `.PATCH` APIS implemented yet). For example `require("lua-github").GET["repos/:owner/:repo/releases/latest"](owner, repo)`.
 

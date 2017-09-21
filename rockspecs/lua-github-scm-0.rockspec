@@ -20,7 +20,6 @@ dependencies = {
 	"lua >= 5.1, < 5.4",
 	"lua-curl",
 	"dkjson",
-	"luafilesystem",
 	"net-url",
 }
 

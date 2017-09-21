@@ -77,3 +77,18 @@ The library has a .describe function that produces an automated help text. I'm n
 ```
 
 Only the shorthand aliases in `.easy` are described on `require`. If you want the signature or help text of a "core" method, you need to send that reference to `require("lua-github").describe(ref)` first. `.signature` and `.helpText` should be wrapped in a metatable access check and autodescribed, but I don't care about any of this right now.
+
+## Adding a runtime alias
+
+If you don't want to invoke REST methods like `gh.GET["repos/:owner/:repo/releases/latest"](owner, repo)`, you can add aliases to make things easier for yourself. Of course you can also just simply wrap the methods yourself, so I have no idea why I added the aliasing aspect really. But here it is anyway.
+
+```lua
+local gh = require("lua-github")
+local name = gh.AddAlias("GET", "repos/:owner/:repo/releases/latest")
+print(name) -- getRepoReleasesLatest
+local name = gh.AddAlias("GET", "repos/:owner/:repo/releases/latest", "latest")
+print(name) -- latest
+```
+So the third argument is optional, and if you don't pass anything, the library has an internal function that creates the name based on the given path. Regardless, the name is returned from `AddAlias`, or it returns `nil` if an alias with the name already exists.
+
+Any method can be aliased as many times as you want.

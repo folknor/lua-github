@@ -15,7 +15,7 @@ The module is not published on luarocks.org yet.
 
 The code isn't very nice, because I just wanted to get it working ASAP. I don't really care about performance, because I only use it from shell scripts.
 
-I welcome patches, and I welcome invasive and destructive patches - there is no API stability, there is no coding convention, there is no "please don't make whitespace changes", there are no limits. If you want to contribute, then please do - unhinged.
+I welcome patches, and I welcome invasive and destructive patches - there is no API stability (because it's not released on luarocks yet), there is no coding convention, there is no "please don't make whitespace changes", there are no limits. If you want to contribute, then please do - unhinged.
 
 Note that the API is not async (I could have used lluv-lua-curl), because I mostly use it in shell scripts, so async would just be annoying.
 
@@ -30,6 +30,7 @@ end
 
 Prints:
 ```
+latestRelease: owner, repo
 getRelease: owner, repo, id
 createRelease: body, owner, repo
 listReleases: owner, repo
@@ -41,6 +42,19 @@ uploadReleaseAsset: owner, repo, releaseId, qualifiedFile, ?contentType(=guess),
 (uploadReleaseAssets qualifiedFile is simply passed directly to io.open)
 
 But most of the API is actually contained in `require("lua-github").GET, .POST, .DELETE, .PUT` (there are no `.PATCH` APIS implemented yet). For example `require("lua-github").GET["repos/:owner/:repo/releases/latest"](owner, repo)`.
+
+## Example
+
+```lua
+local gh = require("github").easy
+local _, data = gh.latestRelease("folknor", "lua-github")
+local _, ul = gh.uploadReleaseAsset("folknor", "lua-github", data.id, "lua-github.zip", nil, nil, data.upload_url)
+-- contentType (nil after the zip) is autodetected if nil
+-- it only supports a small number of .ext-to-mimes, look at github.lua
+-- label is nil
+print(ul.browser_download_url)
+print(ul.id)
+```
 
 ## Help text
 
